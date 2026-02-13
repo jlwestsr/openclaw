@@ -54,16 +54,16 @@ export const usageStylesString = `
     align-items: center;
     gap: 6px;
     padding: 4px 10px;
-    background: rgba(255, 77, 77, 0.1);
+    background: var(--accent-subtle);
     border-radius: 4px;
     font-size: 12px;
-    color: #ff4d4d;
+    color: var(--accent);
   }
   .usage-refresh-indicator::before {
     content: "";
     width: 10px;
     height: 10px;
-    border: 2px solid #ff4d4d;
+    border: 2px solid var(--accent);
     border-top-color: transparent;
     border-radius: 50%;
     animation: usage-spin 0.6s linear infinite;
@@ -161,36 +161,36 @@ export const usageStylesString = `
     border-color: var(--border-strong);
   }
   .usage-primary-btn {
-    background: #ff4d4d;
-    color: #fff;
-    border-color: #ff4d4d;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
     box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.12);
   }
   .btn.usage-primary-btn {
-    background: #ff4d4d !important;
-    border-color: #ff4d4d !important;
-    color: #fff !important;
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: var(--primary-foreground) !important;
   }
   .usage-primary-btn:hover {
-    background: #e64545;
-    border-color: #e64545;
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
   }
   .btn.usage-primary-btn:hover {
-    background: #e64545 !important;
-    border-color: #e64545 !important;
+    background: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
   }
   .usage-primary-btn:disabled {
-    background: rgba(255, 77, 77, 0.18);
-    border-color: rgba(255, 77, 77, 0.3);
-    color: #ff4d4d;
+    background: var(--accent-subtle);
+    border-color: var(--accent-subtle);
+    color: var(--accent);
     box-shadow: none;
     cursor: default;
     opacity: 1;
   }
   .usage-primary-btn[disabled] {
-    background: rgba(255, 77, 77, 0.18) !important;
-    border-color: rgba(255, 77, 77, 0.3) !important;
-    color: #ff4d4d !important;
+    background: var(--accent-subtle) !important;
+    border-color: var(--accent-subtle) !important;
+    color: var(--accent) !important;
     opacity: 1 !important;
   }
   .usage-secondary-btn {
@@ -638,13 +638,13 @@ export const usageStylesString = `
     color: var(--text-strong);
   }
   .usage-summary-value.good {
-    color: #1f8f4e;
+    color: var(--ok);
   }
   .usage-summary-value.warn {
-    color: #c57a00;
+    color: var(--warn);
   }
   .usage-summary-value.bad {
-    color: #c9372c;
+    color: var(--danger);
   }
   .usage-summary-hint {
     font-size: 10px;
@@ -799,8 +799,8 @@ export const usageStylesString = `
     color: var(--text);
   }
   .chart-toggle .toggle-btn.active {
-    background: #ff4d4d;
-    color: white;
+    background: var(--primary);
+    color: var(--primary-foreground);
   }
   .chart-toggle.small .toggle-btn {
     padding: 4px 8px;
@@ -856,14 +856,14 @@ export const usageStylesString = `
   .daily-bar {
     width: 100%;
     max-width: var(--bar-max-width, 32px);
-    background: #ff4d4d;
+    background: var(--primary);
     border-radius: 3px 3px 0 0;
     min-height: 2px;
     transition: all 0.15s;
     overflow: hidden;
   }
   .daily-bar-wrapper:hover .daily-bar {
-    background: #cc3d3d;
+    background: var(--accent-hover);
   }
   .daily-bar-label {
     position: absolute;
@@ -932,16 +932,16 @@ export const usageStylesString = `
     position: relative;
   }
   .cost-segment.output {
-    background: #ef4444;
+    background: var(--danger);
   }
   .cost-segment.input {
-    background: #f59e0b;
+    background: var(--warn);
   }
   .cost-segment.cache-write {
-    background: #10b981;
+    background: var(--ok);
   }
   .cost-segment.cache-read {
-    background: #06b6d4;
+    background: var(--info);
   }
   .cost-breakdown-legend {
     display: flex;
@@ -969,28 +969,28 @@ export const usageStylesString = `
     flex-shrink: 0;
   }
   .legend-dot.output {
-    background: #ef4444;
+    background: var(--danger);
   }
   .legend-dot.input {
-    background: #f59e0b;
+    background: var(--warn);
   }
   .legend-dot.cache-write {
-    background: #10b981;
+    background: var(--ok);
   }
   .legend-dot.cache-read {
-    background: #06b6d4;
+    background: var(--info);
   }
   .legend-dot.system {
-    background: #ff4d4d;
+    background: var(--accent);
   }
   .legend-dot.skills {
-    background: #8b5cf6;
+    background: var(--accent-2);
   }
   .legend-dot.tools {
-    background: #ec4899;
+    background: var(--accent-2-muted);
   }
   .legend-dot.files {
-    background: #f59e0b;
+    background: var(--warn);
   }
   .cost-breakdown-note {
     margin-top: 10px;
@@ -1130,32 +1130,32 @@ export const usageStylesString = `
     fill: var(--text-muted);
   }
   .timeseries-svg .ts-area {
-    fill: #ff4d4d;
+    fill: var(--primary);
     fill-opacity: 0.1;
   }
   .timeseries-svg .ts-line {
     fill: none;
-    stroke: #ff4d4d;
+    stroke: var(--primary);
     stroke-width: 2;
   }
   .timeseries-svg .ts-dot {
-    fill: #ff4d4d;
+    fill: var(--primary);
     transition: r 0.15s, fill 0.15s;
   }
   .timeseries-svg .ts-dot:hover {
     r: 5;
   }
   .timeseries-svg .ts-bar {
-    fill: #ff4d4d;
+    fill: var(--primary);
     transition: fill 0.15s;
   }
   .timeseries-svg .ts-bar:hover {
-    fill: #cc3d3d;
+    fill: var(--accent-hover);
   }
-  .timeseries-svg .ts-bar.output { fill: #ef4444; }
-  .timeseries-svg .ts-bar.input { fill: #f59e0b; }
-  .timeseries-svg .ts-bar.cache-write { fill: #10b981; }
-  .timeseries-svg .ts-bar.cache-read { fill: #06b6d4; }
+  .timeseries-svg .ts-bar.output { fill: var(--danger); }
+  .timeseries-svg .ts-bar.input { fill: var(--warn); }
+  .timeseries-svg .ts-bar.cache-write { fill: var(--ok); }
+  .timeseries-svg .ts-bar.cache-read { fill: var(--info); }
   .timeseries-summary {
     margin-top: 12px;
     font-size: 13px;
@@ -1281,16 +1281,16 @@ export const usageStylesString = `
     transition: width 0.3s ease;
   }
   .context-segment.system {
-    background: #ff4d4d;
+    background: var(--accent);
   }
   .context-segment.skills {
-    background: #8b5cf6;
+    background: var(--accent-2);
   }
   .context-segment.tools {
-    background: #ec4899;
+    background: var(--accent-2-muted);
   }
   .context-segment.files {
-    background: #f59e0b;
+    background: var(--warn);
   }
   .context-legend {
     display: flex;
