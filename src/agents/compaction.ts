@@ -15,8 +15,19 @@ export const SAFETY_MARGIN = 1.2; // 20% buffer for estimateTokens() inaccuracy
 const DEFAULT_SUMMARY_FALLBACK = "No prior history.";
 const DEFAULT_PARTS = 2;
 const MERGE_SUMMARIES_INSTRUCTIONS =
-  "Merge these partial summaries into a single cohesive summary. Preserve decisions," +
-  " TODOs, open questions, and any constraints.";
+  "Merge these partial summaries into a single cohesive summary.\n\n" +
+  "You MUST preserve all of the following if present:\n" +
+  "- **Decisions made** - what was decided and why\n" +
+  "- **TODOs and open tasks** - incomplete work, next steps\n" +
+  "- **Open questions** - unresolved issues awaiting answers\n" +
+  "- **Constraints and requirements** - technical or user-imposed limits\n" +
+  "- **File paths and commands** - specific files edited, commands run, branches used\n" +
+  "- **Errors encountered** - what failed and whether it was resolved\n" +
+  "- **User preferences expressed** - any stated preferences or corrections\n" +
+  "- **Key tool interactions** - important tool calls and their outcomes (not routine reads)\n\n" +
+  "Structure the summary with clear sections when content warrants it. " +
+  "Prefer concrete details (file names, error messages, specific values) over vague descriptions.";
+
 const IDENTIFIER_PRESERVATION_INSTRUCTIONS =
   "Preserve all opaque identifiers exactly as written (no shortening or reconstruction), " +
   "including UUIDs, hashes, IDs, tokens, API keys, hostnames, IPs, ports, URLs, and file names.";
