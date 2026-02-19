@@ -46,13 +46,25 @@ const MIDDLE_OMISSION_MARKER =
 function hasImportantTail(text: string): boolean {
   // Check last ~2000 chars for error-like patterns
   const tail = text.slice(-2000).toLowerCase();
-  return (
-    /\b(error|exception|failed|fatal|traceback|panic|stack trace|errno|exit code)\b/.test(tail) ||
-    // JSON closing — if the output is JSON, the tail has closing structure
-    /\}\s*$/.test(tail.trim()) ||
-    // Summary/result lines often appear at the end
-    /\b(total|summary|result|complete|finished|done)\b/.test(tail)
-  );
+
+  // Error/diagnostic keywords — strong signal
+  if (/\b(error|exception|failed|fatal|traceback|panic|stack trace|errno|exit code)\b/.test(tail)) {
+    return true;
+  }
+
+  // JSON structure — only if the output actually starts like JSON (not incidental code)
+  const trimmedStart = text.trimStart();
+  if (/\}\s*$/.test(tail.trim()) && /^[[{]/.test(trimmedStart)) {
+    return true;
+  }
+
+  // Summary/result lines — require line-start anchoring with numbers to avoid
+  // false positives on normal text containing "done" or "result"
+  if (/^(tests?|total|summary|results?|passed|failed|errors?)\s*[:=]\s*\d/m.test(tail)) {
+    return true;
+  }
+
+  return false;
 }
 
 /**
@@ -89,10 +101,7 @@ export function truncateToolResultText(text: string, maxChars: number): string {
       }
 
       return (
-        text.slice(0, headCut) +
-        MIDDLE_OMISSION_MARKER +
-        text.slice(tailStart) +
-        TRUNCATION_SUFFIX
+        text.slice(0, headCut) + MIDDLE_OMISSION_MARKER + text.slice(tailStart) + TRUNCATION_SUFFIX
       );
     }
   }
