@@ -10,7 +10,9 @@ import { logVerbose } from "../../globals.js";
 import { registerAgentRunContext } from "../../infra/agent-events.js";
 import { defaultRuntime } from "../../runtime.js";
 import { stripHeartbeatToken } from "../heartbeat.js";
+import type { OriginatingChannelType } from "../templating.js";
 import { isSilentReplyText, SILENT_REPLY_TOKEN } from "../tokens.js";
+import type { GetReplyOptions, ReplyPayload } from "../types.js";
 import { resolveRunAuthProfile } from "./agent-runner-utils.js";
 import {
   resolveOriginAccountId,
@@ -28,6 +30,7 @@ import { resolveReplyToMode } from "./reply-threading.js";
 import { isRoutableChannel, routeReply } from "./route-reply.js";
 import { incrementRunCompactionCount, persistRunSessionUsage } from "./session-run-accounting.js";
 import { createTypingSignaler } from "./typing-mode.js";
+import type { TypingController } from "./typing.js";
 
 export function createFollowupRunner(params: {
   opts?: GetReplyOptions;
@@ -192,6 +195,15 @@ export function createFollowupRunner(params: {
                   return;
                 }
                 const phase = typeof evt.data.phase === "string" ? evt.data.phase : "";
+                if (phase === "start") {
+                  const announceCompaction =
+                    queued.run.config?.agents?.defaults?.compaction?.announce === true;
+                  if (announceCompaction && opts?.onBlockReply) {
+                    void opts.onBlockReply({
+                      text: "🧹 Compacting memory — back in a moment…",
+                    });
+                  }
+                }
                 if (phase === "end") {
                   autoCompactionCompleted = true;
                 }
