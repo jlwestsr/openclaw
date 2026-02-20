@@ -93,6 +93,7 @@ export const AgentDefaultsSchema = z
           })
           .strict()
           .optional(),
+        announce: z.boolean().optional(),
       })
       .strict()
       .optional(),
