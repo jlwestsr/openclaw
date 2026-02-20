@@ -306,6 +306,18 @@ export type AgentCompactionConfig = {
    * Default: false.
    */
   announce?: boolean;
+  /**
+   * Override provider for compaction summarization (e.g., "anthropic").
+   * When set, compaction uses this provider instead of the main conversation provider.
+   * Useful for using a faster/cheaper model for summarization.
+   */
+  provider?: string;
+  /**
+   * Override model for compaction summarization (e.g., "claude-sonnet-4-6").
+   * When set, compaction uses this model instead of the main conversation model.
+   * Useful for using a faster/cheaper model for summarization.
+   */
+  model?: string;
 };
 
 export type AgentCompactionMemoryFlushConfig = {

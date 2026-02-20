@@ -105,6 +105,8 @@ export const AgentDefaultsSchema = z
           .strict()
           .optional(),
         announce: z.boolean().optional(),
+        provider: z.string().optional(),
+        model: z.string().optional(),
       })
       .strict()
       .optional(),

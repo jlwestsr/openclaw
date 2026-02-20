@@ -1,0 +1,15 @@
+{
+  "id": "compaction-announce",
+  "name": "Compaction Announce",
+  "description": "Posts a message to a configured Discord channel when compaction starts and ends.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "channelId": {
+        "type": "string",
+        "description": "Discord channel ID to post compaction announcements"
+      }
+    }
+  }
+}
