@@ -295,6 +295,13 @@ export type AgentCompactionConfig = {
   maxHistoryShare?: number;
   /** Pre-compaction memory flush (agentic turn). Default: enabled. */
   memoryFlush?: AgentCompactionMemoryFlushConfig;
+  /**
+   * Announce compaction start/end to the active channel.
+   * When true, a brief status message is sent before compaction begins
+   * and after it completes, regardless of verbose mode.
+   * Default: false.
+   */
+  announce?: boolean;
 };
 
 export type AgentCompactionMemoryFlushConfig = {

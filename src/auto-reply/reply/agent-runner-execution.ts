@@ -1,5 +1,10 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
+import type { TemplateContext } from "../templating.js";
+import type { VerboseLevel } from "../thinking.js";
+import type { GetReplyOptions, ReplyPayload } from "../types.js";
+import type { FollowupRun } from "./queue.js";
+import type { TypingSignaler } from "./typing-mode.js";
 import { runCliAgent } from "../../agents/cli-runner.js";
 import { getCliSessionId } from "../../agents/cli-session.js";
 import { runWithModelFallback } from "../../agents/model-fallback.js";
@@ -26,19 +31,14 @@ import {
   resolveMessageChannel,
 } from "../../utils/message-channel.js";
 import { stripHeartbeatToken } from "../heartbeat.js";
-import type { TemplateContext } from "../templating.js";
-import type { VerboseLevel } from "../thinking.js";
 import { isSilentReplyText, SILENT_REPLY_TOKEN } from "../tokens.js";
-import type { GetReplyOptions, ReplyPayload } from "../types.js";
 import {
   buildEmbeddedRunBaseParams,
   buildEmbeddedRunContexts,
   resolveModelFallbackOptions,
 } from "./agent-runner-utils.js";
 import { type BlockReplyPipeline } from "./block-reply-pipeline.js";
-import type { FollowupRun } from "./queue.js";
 import { createBlockReplyDeliveryHandler } from "./reply-delivery.js";
-import type { TypingSignaler } from "./typing-mode.js";
 
 export type AgentRunLoopResult =
   | {
@@ -320,9 +320,19 @@ export async function runAgentTurnWithFallback(params: {
                   await params.opts?.onToolStart?.({ name, phase });
                 }
               }
-              // Track auto-compaction completion
+              // Track auto-compaction lifecycle and optionally announce
               if (evt.stream === "compaction") {
                 const phase = typeof evt.data.phase === "string" ? evt.data.phase : "";
+                if (phase === "start") {
+                  // Announce compaction start if configured
+                  const announceCompaction =
+                    params.followupRun.run.config?.agents?.defaults?.compaction?.announce === true;
+                  if (announceCompaction && params.opts?.onBlockReply) {
+                    void params.opts.onBlockReply({
+                      text: "🧹 Compacting memory — back in a moment…",
+                    });
+                  }
+                }
                 if (phase === "end") {
                   autoCompactionCompleted = true;
                 }
