@@ -4,6 +4,11 @@ Docs: https://docs.openclaw.ai
 
 ## 2026.2.26 (Unreleased)
 
+### Maintenance
+
+- Upstream sync: rebased 6 local commits onto upstream/main (4 commits: HSTS header hardening, cron announce test coverage, redundant trigger test pruning, pi-tools gating assertion consolidation).
+- Build fix: removed duplicate `import type` declarations for `TemplateContext`, `VerboseLevel`, `GetReplyOptions`, and `ReplyPayload` in `src/auto-reply/reply/agent-runner-execution.ts` that were causing `PARSE_ERROR` build failures.
+
 ### Changes
 
 - Highlight: External Secrets Management introduces a full `openclaw secrets` workflow (`audit`, `configure`, `apply`, `reload`) with runtime snapshot activation, strict `secrets apply` target-path validation, safer migration scrubbing, ref-only auth-profile support, and dedicated docs. (#26155) Thanks @joshavant.
