@@ -8,6 +8,7 @@ Docs: https://docs.openclaw.ai
 
 - Upstream sync: rebased 7 local commits onto upstream/main (280 upstream commits absorbed). Lockfile conflict resolved by taking upstream version. Build verified clean.
 - Build fix: removed duplicate `import type` declarations for `TemplateContext`, `VerboseLevel`, `GetReplyOptions`, and `ReplyPayload` in `src/auto-reply/reply/agent-runner-execution.ts` that were causing `PARSE_ERROR` build failures.
+- Systemd bind fix: changed `--bind lan` to `--bind loopback` in `/etc/systemd/system/openclaw.service`. The upstream sync introduced a Control UI origin security check that rejects non-loopback binds without explicit `gateway.controlUi.allowedOrigins`. The CLI `--bind lan` flag was overriding the config file's `bind: "loopback"`, causing a crash-loop (74 restarts). Recovery runbook updated with this failure mode.
 
 ### Changes
 
