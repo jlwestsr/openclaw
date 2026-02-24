@@ -6,7 +6,7 @@ Docs: https://docs.openclaw.ai
 
 ### Maintenance
 
-- Upstream sync: rebased 6 local commits onto upstream/main (4 commits: HSTS header hardening, cron announce test coverage, redundant trigger test pruning, pi-tools gating assertion consolidation).
+- Upstream sync: rebased 7 local commits onto upstream/main (280 upstream commits absorbed). Lockfile conflict resolved by taking upstream version. Build verified clean.
 - Build fix: removed duplicate `import type` declarations for `TemplateContext`, `VerboseLevel`, `GetReplyOptions`, and `ReplyPayload` in `src/auto-reply/reply/agent-runner-execution.ts` that were causing `PARSE_ERROR` build failures.
 
 ### Changes
