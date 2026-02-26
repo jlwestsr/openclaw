@@ -9,6 +9,7 @@ Docs: https://docs.openclaw.ai
 - Upstream sync: rebased 7 local commits onto upstream/main (280 upstream commits absorbed). Lockfile conflict resolved by taking upstream version. Build verified clean.
 - Build fix: removed duplicate `import type` declarations for `TemplateContext`, `VerboseLevel`, `GetReplyOptions`, and `ReplyPayload` in `src/auto-reply/reply/agent-runner-execution.ts` that were causing `PARSE_ERROR` build failures.
 - Systemd bind fix: changed `--bind lan` to `--bind loopback` in `/etc/systemd/system/openclaw.service`. The upstream sync introduced a Control UI origin security check that rejects non-loopback binds without explicit `gateway.controlUi.allowedOrigins`. The CLI `--bind lan` flag was overriding the config file's `bind: "loopback"`, causing a crash-loop (74 restarts). Recovery runbook updated with this failure mode.
+- Upstream sync (2026-02-26): rebased 6 local commits onto upstream/main (577 upstream commits absorbed). Two conflicts resolved: (1) `followup-runner.ts` import reordering + function rename `resolveAgentModelFallbacksOverride` → `resolveRunModelFallbacksOverride` — took upstream naming, preserved compaction announce logic; (2) `pnpm-lock.yaml` — took upstream version, reconciled with `pnpm install` (108 packages added, 19 removed). Build verified clean. Notable upstream additions: external secrets management, exec argv sanitization security fix, Android/session refactors.
 
 ### Changes
 
