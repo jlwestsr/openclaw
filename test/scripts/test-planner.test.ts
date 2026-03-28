@@ -40,6 +40,7 @@ describe("test planner", () => {
     );
 
     expect(plan.runtimeCapabilities.runtimeProfileName).toBe("local-darwin");
+    expect(plan.failurePolicy).toBe("fail-fast");
     expect(plan.runtimeCapabilities.memoryBand).toBe("mid");
     expect(plan.executionBudget.unitSharedWorkers).toBe(4);
     expect(plan.executionBudget.topLevelParallelLimitNoIsolate).toBe(8);
@@ -174,6 +175,25 @@ describe("test planner", () => {
         .map((unit) => unit.surface)
         .toSorted((left, right) => left.localeCompare(right)),
     ).toEqual(["base", "channels"]);
+    artifacts.cleanupTempArtifacts();
+  });
+
+  it("normalizes --bail=0 into collect-all failure policy", () => {
+    const artifacts = createExecutionArtifacts({});
+    const plan = buildExecutionPlan(
+      {
+        mode: "local",
+        surfaces: ["unit"],
+        passthroughArgs: ["--bail=0"],
+      },
+      {
+        env: {},
+        writeTempJsonArtifact: artifacts.writeTempJsonArtifact,
+      },
+    );
+
+    expect(plan.failurePolicy).toBe("collect-all");
+    expect(plan.passthroughOptionArgs).not.toContain("--bail=0");
     artifacts.cleanupTempArtifacts();
   });
 
@@ -356,7 +376,7 @@ describe("test planner", () => {
     expect(manifest.jobs.checkDocs.enabled).toBe(true);
   });
 
-  it("adds push-only compat and release lanes to push manifests", () => {
+  it("adds the push-only compat lane to push manifests", () => {
     const manifest = buildCIExecutionManifest(
       {
         eventName: "push",
@@ -374,7 +394,6 @@ describe("test planner", () => {
       },
     );
 
-    expect(manifest.jobs.releaseCheck.enabled).toBe(true);
     expect(
       manifest.jobs.checks.matrix.include.some((entry) => entry.task === "compat-node22"),
     ).toBe(true);
@@ -419,6 +438,19 @@ describe("resolveVitestFsModuleCachePath", () => {
         unitId: "unit-fast-1",
       }),
     ).toBe("/repo/node_modules/.experimental-vitest-cache/unit-fast-1");
+  });
+
+  it("honors the requested Windows platform when building the cache path", () => {
+    expect(
+      resolveVitestFsModuleCachePath({
+        cwd: "/repo",
+        env: {
+          OPENCLAW_VITEST_FS_MODULE_CACHE: "1",
+        },
+        platform: "win32",
+        unitId: "unit-fast-1",
+      }),
+    ).toBe("\\repo\\node_modules\\.experimental-vitest-cache\\unit-fast-1");
   });
 
   it("respects an explicit cache path override", () => {
