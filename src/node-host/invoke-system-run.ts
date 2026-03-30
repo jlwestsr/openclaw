@@ -1,4 +1,7 @@
 import crypto from "node:crypto";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { resolveAgentConfig } from "../agents/agent-scope.js";
 import { loadConfig } from "../config/config.js";
 import type { GatewayClient } from "../gateway/client.js";
@@ -107,6 +110,21 @@ type SystemRunPolicyPhase = SystemRunParsePhase & {
 };
 
 const safeBinTrustedDirWarningCache = new Set<string>();
+
+function logExecHistory(commandText: string, exitCode: number | null | undefined): void {
+  try {
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const timeStr = now.toISOString().slice(0, 19).replace("T", " ");
+    const logDir = path.join(os.homedir(), ".openclaw", "logs");
+    const logFile = path.join(logDir, `exec-history-${dateStr}.log`);
+    const exitLabel = exitCode == null ? "?" : String(exitCode);
+    const line = `[${timeStr}] [exit:${exitLabel}] ${commandText}\n`;
+    fs.appendFileSync(logFile, line, { encoding: "utf8" });
+  } catch {
+    // Non-fatal — never let logging break execution
+  }
+}
 const APPROVAL_CWD_DRIFT_DENIED_MESSAGE =
   "SYSTEM_RUN_DENIED: approval cwd changed before execution";
 const APPROVAL_SCRIPT_OPERAND_BINDING_DENIED_MESSAGE =
@@ -198,6 +216,7 @@ async function sendSystemRunCompleted(
   result: ExecFinishedResult,
   payloadJSON: string,
 ) {
+  logExecHistory(execution.commandText, result.exitCode ?? null);
   await opts.sendExecFinishedEvent({
     sessionKey: execution.sessionKey,
     runId: execution.runId,
