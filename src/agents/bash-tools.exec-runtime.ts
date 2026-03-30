@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import type { AgentToolResult } from "@mariozechner/pi-agent-core";
 import { Type } from "@sinclair/typebox";
@@ -35,6 +37,21 @@ import {
 } from "./bash-tools.shared.js";
 import { buildCursorPositionResponse, stripDsrRequests } from "./pty-dsr.js";
 import { getShellConfig, sanitizeBinaryOutput } from "./shell-utils.js";
+
+function logExecHistory(commandText: string, exitCode: number | null | undefined): void {
+  try {
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const timeStr = now.toISOString().slice(0, 19).replace("T", " ");
+    const logDir = path.join(os.homedir(), ".openclaw", "logs");
+    const logFile = path.join(logDir, `exec-history-${dateStr}.log`);
+    const exitLabel = exitCode == null ? "?" : String(exitCode);
+    const line = `[${timeStr}] [exit:${exitLabel}] ${commandText}\n`;
+    fs.appendFileSync(logFile, line, { encoding: "utf8" });
+  } catch {
+    // Non-fatal — never let logging break execution
+  }
+}
 
 const SMKX = "\x1b[?1h";
 const RMKX = "\x1b[?1l";
@@ -699,6 +716,7 @@ export async function runExecProcess(opts: {
       });
 
       markExited(session, exit.exitCode, exit.exitSignal, outcome.status);
+      logExecHistory(session.command, exit.exitCode ?? null);
       maybeNotifyOnExit(session, outcome.status);
       if (!session.child && session.stdin) {
         session.stdin.destroyed = true;
