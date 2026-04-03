@@ -153,16 +153,26 @@ describe("web search provider config", () => {
 });
 
 describe("talk.voiceAliases", () => {
-  it("accepts a string map of voice aliases", () => {
-    const res = validateConfigObject({
-      talk: {
-        voiceAliases: {
-          Clawd: "EXAVITQu4vr4xnSDxMaL",
-          Roger: "CwhRBWXzGAHq8TQ4Fs17",
+  it("accepts a string map of voice aliases via legacy talk migration", async () => {
+    await withTempHome(async (home) => {
+      await writeOpenClawConfig(home, {
+        talk: {
+          voiceAliases: {
+            Clawd: "EXAVITQu4vr4xnSDxMaL",
+            Roger: "CwhRBWXzGAHq8TQ4Fs17",
+          },
         },
-      },
+      });
+
+      const snap = await readConfigFileSnapshot();
+
+      expect(snap.valid).toBe(true);
+      expect(snap.legacyIssues.some((issue) => issue.path === "talk")).toBe(true);
+      expect(snap.sourceConfig.talk?.providers?.elevenlabs?.voiceAliases).toEqual({
+        Clawd: "EXAVITQu4vr4xnSDxMaL",
+        Roger: "CwhRBWXzGAHq8TQ4Fs17",
+      });
     });
-    expect(res.ok).toBe(true);
   });
 
   it("rejects non-string voice alias values", () => {
@@ -511,6 +521,73 @@ describe("config strict validation", () => {
       expect(
         (snap.sourceConfig.messages?.tts as Record<string, unknown> | undefined)?.elevenlabs,
       ).toBeUndefined();
+    });
+  });
+
+  it("accepts legacy talk flat fields via auto-migration and reports legacyIssues", async () => {
+    await withTempHome(async (home) => {
+      await writeOpenClawConfig(home, {
+        talk: {
+          voiceId: "voice-1",
+          modelId: "eleven_v3",
+          apiKey: "test-key",
+        },
+      });
+
+      const snap = await readConfigFileSnapshot();
+
+      expect(snap.valid).toBe(true);
+      expect(snap.legacyIssues.some((issue) => issue.path === "talk")).toBe(true);
+      expect(snap.sourceConfig.talk?.providers?.elevenlabs).toEqual({
+        voiceId: "voice-1",
+        modelId: "eleven_v3",
+        apiKey: "test-key",
+      });
+      expect(
+        (snap.sourceConfig.talk as Record<string, unknown> | undefined)?.voiceId,
+      ).toBeUndefined();
+      expect(
+        (snap.sourceConfig.talk as Record<string, unknown> | undefined)?.modelId,
+      ).toBeUndefined();
+      expect(
+        (snap.sourceConfig.talk as Record<string, unknown> | undefined)?.apiKey,
+      ).toBeUndefined();
+    });
+  });
+
+  it("accepts legacy sandbox perSession via auto-migration and reports legacyIssues", async () => {
+    await withTempHome(async (home) => {
+      await writeOpenClawConfig(home, {
+        agents: {
+          defaults: {
+            sandbox: {
+              perSession: true,
+            },
+          },
+          list: [
+            {
+              id: "pi",
+              sandbox: {
+                perSession: false,
+              },
+            },
+          ],
+        },
+      });
+
+      const snap = await readConfigFileSnapshot();
+
+      expect(snap.valid).toBe(true);
+      expect(snap.legacyIssues.some((issue) => issue.path === "agents.defaults.sandbox")).toBe(
+        true,
+      );
+      expect(snap.legacyIssues.some((issue) => issue.path === "agents.list")).toBe(true);
+      expect(snap.sourceConfig.agents?.defaults?.sandbox).toEqual({
+        scope: "session",
+      });
+      expect(snap.sourceConfig.agents?.list?.[0]?.sandbox).toEqual({
+        scope: "shared",
+      });
     });
   });
 
