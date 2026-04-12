@@ -1,12 +1,14 @@
 import {
-  applyModelCompatPatch,
   getModelProviderHint,
   normalizeNativeXaiModelId,
   normalizeProviderId,
   resolveProviderEndpoint,
-} from "openclaw/plugin-sdk/provider-model-shared";
-import type { ModelCompatConfig } from "openclaw/plugin-sdk/provider-model-shared";
-import { resolveXaiModelCompatPatch } from "openclaw/plugin-sdk/provider-tools";
+} from "@openclaw/plugin-sdk/provider-model-shared";
+import {
+  applyXaiModelCompat,
+  resolveXaiModelCompatPatch,
+} from "@openclaw/plugin-sdk/provider-tools";
+import { readStringValue } from "openclaw/plugin-sdk/text-runtime";
 
 export { buildXaiProvider } from "./provider-catalog.js";
 export { applyXaiConfig, applyXaiProviderConfig } from "./onboard.js";
@@ -22,17 +24,11 @@ export {
 } from "./model-definitions.js";
 export { isModernXaiModel, resolveXaiForwardCompatModel } from "./provider-models.js";
 export {
+  applyXaiModelCompat,
   HTML_ENTITY_TOOL_CALL_ARGUMENTS_ENCODING,
   XAI_TOOL_SCHEMA_PROFILE,
   resolveXaiModelCompatPatch,
-} from "openclaw/plugin-sdk/provider-tools";
-
-export function applyXaiModelCompat<T extends { compat?: unknown }>(model: T): T {
-  return applyModelCompatPatch(
-    model as T & { compat?: ModelCompatConfig },
-    resolveXaiModelCompatPatch(),
-  ) as T;
-}
+} from "@openclaw/plugin-sdk/provider-tools";
 
 function isXaiNativeEndpoint(baseUrl: unknown): boolean {
   return (
@@ -80,6 +76,6 @@ export function resolveXaiTransport(params: {
   }
   return {
     api: "openai-responses",
-    baseUrl: typeof params.baseUrl === "string" ? params.baseUrl : undefined,
+    baseUrl: readStringValue(params.baseUrl),
   };
 }

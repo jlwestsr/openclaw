@@ -87,7 +87,7 @@ describe("resolveCronSession", () => {
       entry: {
         sessionId: "old-session-id",
         updatedAt: 1000,
-        model: "claude-opus-4-5",
+        model: "claude-opus-4-6",
       },
     });
 
@@ -167,6 +167,24 @@ describe("resolveCronSession", () => {
       expect(clearBootstrapSnapshot).toHaveBeenCalledWith("webhook:stable-key");
     });
 
+    it("clears stale sessionFile when forceNew rolls to a fresh session", () => {
+      const result = resolveWithStoredEntry({
+        entry: {
+          sessionId: "existing-session-id-456",
+          updatedAt: NOW_MS - 1000,
+          sessionFile: "/tmp/stale-session.jsonl",
+          modelOverride: "sonnet-4",
+        },
+        fresh: true,
+        forceNew: true,
+      });
+
+      expect(result.sessionEntry.sessionId).not.toBe("existing-session-id-456");
+      expect(result.isNewSession).toBe(true);
+      expect(result.sessionEntry.sessionFile).toBeUndefined();
+      expect(result.sessionEntry.modelOverride).toBe("sonnet-4");
+    });
+
     it("clears delivery routing metadata and deliveryContext when forceNew is true", () => {
       const result = resolveWithStoredEntry({
         entry: {
@@ -182,7 +200,7 @@ describe("resolveCronSession", () => {
             to: "channel:C0XXXXXXXXX",
             threadId: "1737500000.123456",
           },
-          modelOverride: "gpt-5.2",
+          modelOverride: "gpt-5.4",
         },
         fresh: true,
         forceNew: true,
@@ -198,7 +216,7 @@ describe("resolveCronSession", () => {
       expect(result.sessionEntry.lastThreadId).toBeUndefined();
       expect(result.sessionEntry.deliveryContext).toBeUndefined();
       // Per-session overrides must be preserved
-      expect(result.sessionEntry.modelOverride).toBe("gpt-5.2");
+      expect(result.sessionEntry.modelOverride).toBe("gpt-5.4");
     });
 
     it("clears delivery routing metadata when session is stale", () => {

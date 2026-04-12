@@ -2,11 +2,102 @@ import type { OpenClawConfig } from "openclaw/plugin-sdk/config-runtime";
 import { describe, expect, it } from "vitest";
 import {
   collectDiscordNumericIdWarnings,
+  discordDoctor,
   maybeRepairDiscordNumericIds,
   scanDiscordNumericIdEntries,
 } from "./doctor.js";
 
 describe("discord doctor", () => {
+  it("leaves legacy discord streaming aliases untouched during doctor normalization", () => {
+    const normalize = discordDoctor.normalizeCompatibilityConfig;
+    expect(normalize).toBeDefined();
+    if (!normalize) {
+      return;
+    }
+
+    const result = normalize({
+      cfg: {
+        channels: {
+          discord: {
+            streamMode: "block",
+            chunkMode: "newline",
+            blockStreaming: true,
+            draftChunk: {
+              minChars: 120,
+            },
+            accounts: {
+              work: {
+                streaming: false,
+                blockStreamingCoalesce: {
+                  idleMs: 250,
+                },
+              },
+            },
+          },
+        },
+      } as never,
+    });
+
+    expect(result.config.channels?.discord).toEqual({
+      streamMode: "block",
+      chunkMode: "newline",
+      blockStreaming: true,
+      draftChunk: {
+        minChars: 120,
+      },
+      accounts: {
+        work: {
+          streaming: false,
+          blockStreamingCoalesce: {
+            idleMs: 250,
+          },
+        },
+      },
+    });
+    expect(result.changes).toEqual([]);
+  });
+
+  it("moves account voice.tts.edge into providers.microsoft", () => {
+    const normalize = discordDoctor.normalizeCompatibilityConfig;
+    expect(normalize).toBeDefined();
+    if (!normalize) {
+      return;
+    }
+
+    const result = normalize({
+      cfg: {
+        channels: {
+          discord: {
+            accounts: {
+              main: {
+                voice: {
+                  tts: {
+                    edge: {
+                      voice: "en-US-JennyNeural",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      } as never,
+    });
+
+    expect(result.changes).toContain(
+      "Moved channels.discord.accounts.main.voice.tts.edge → channels.discord.accounts.main.voice.tts.providers.microsoft.",
+    );
+    const mainTts = result.config.channels?.discord?.accounts?.main?.voice?.tts as
+      | Record<string, unknown>
+      | undefined;
+    expect(mainTts?.providers).toEqual({
+      microsoft: {
+        voice: "en-US-JennyNeural",
+      },
+    });
+    expect(mainTts?.edge).toBeUndefined();
+  });
+
   it("finds numeric id entries across discord scopes", () => {
     const cfg = {
       channels: {

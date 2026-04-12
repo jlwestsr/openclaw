@@ -1,13 +1,12 @@
-import type { OpenClawConfig } from "../../../config/config.js";
-import type {
-  PluginHookBeforeAgentStartResult,
-  ProviderRuntimeModel,
-} from "../../../plugins/types.js";
+import type { OpenClawConfig } from "../../../config/types.openclaw.js";
+import type { ProviderRuntimeModel } from "../../../plugins/provider-runtime-model.types.js";
+import type { PluginHookBeforeAgentStartResult } from "../../../plugins/types.js";
 import {
   CONTEXT_WINDOW_HARD_MIN_TOKENS,
   CONTEXT_WINDOW_WARN_BELOW_TOKENS,
   evaluateContextWindowGuard,
   resolveContextWindowInfo,
+  type ContextWindowInfo,
 } from "../../context-window-guard.js";
 import { DEFAULT_CONTEXT_TOKENS } from "../../defaults.js";
 import { FailoverError } from "../../failover-error.js";
@@ -103,7 +102,10 @@ export function resolveEffectiveRuntimeModel(params: {
   provider: string;
   modelId: string;
   runtimeModel: ProviderRuntimeModel;
-}) {
+}): {
+  ctxInfo: ContextWindowInfo;
+  effectiveModel: ProviderRuntimeModel;
+} {
   const ctxInfo = resolveContextWindowInfo({
     cfg: params.cfg,
     provider: params.provider,
